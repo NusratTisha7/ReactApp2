@@ -4,7 +4,6 @@ import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
 
-import logo from "assets/img/reactlogo.png";
 
 function Sidebar({ color, image, routes }) {
   const location = useLocation();
@@ -32,8 +31,8 @@ function Sidebar({ color, image, routes }) {
               {/*/>*/}
             </div>
           </a>
-          <a className="simple-text" href="https://www.bengalsoftware.com" target="_blank">
-            Cizishop
+          <a className="simple-text"  target="_blank">
+            Dashboard
           </a>
         </div>
         <Nav>
