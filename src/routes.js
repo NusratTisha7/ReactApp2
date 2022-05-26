@@ -1,5 +1,5 @@
 import UserCreate from './views/UserCreate';
-
+import UserList from './views/UserList'
 
 const dashboardRoutes = [
 
@@ -8,6 +8,13 @@ const dashboardRoutes = [
     name: "User Create",
     icon: "nc-icon nc-chart-pie-35",
     component: UserCreate,
+    layout: "/admin",
+  },
+  {
+    path: "/userList",
+    name: "User List",
+    icon: "nc-icon nc-chart-pie-35",
+    component: UserList,
     layout: "/admin",
   }
 ];

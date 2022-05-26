@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import FileBase64 from 'react-file-base64';
 import { registration } from '../Api/Api'
 import { userInfo } from '../utils/auth';
@@ -7,12 +7,20 @@ import {
     GoogleMap,
     useLoadScript,
     Marker,
+    InfoWindow
 } from "@react-google-maps/api";
 import axios from 'axios';
 import "../components/User/User.css"
 import Message from '../utils/alert'
+import Button from '../components/User/Button'
+
 
 function UserCreate() {
+
+    useEffect(()=>{ 
+        document.title='User Create'; 
+    },[])
+
     const { token } = userInfo();
     const [map, setMap] = useState(false);
     let [location, setLocation] = useState('Select your location');
@@ -160,7 +168,7 @@ function UserCreate() {
 
     const mapAction = (lat, lng) => {
         handleChangeLocation(lat, lng)
-        setTimeout(handleClose, 2000);
+        //setTimeout(handleClose, 2000);
 
     }
 
@@ -173,12 +181,12 @@ function UserCreate() {
                 aria-describedby="modal-modal-description"
             >
                 <div>
-
-                    <GoogleMap mapContainerStyle={mapContainerStyle} zoom={8}
+                
+                    <GoogleMap mapContainerStyle={mapContainerStyle} zoom={8} 
                         center={center} options={options}
                         onClick={(event) => {
                             new Date().toISOString
-                            setMarkers(current => [...current, {
+                            setMarkers([{
                                 lat: event.latLng.lat(),
                                 lng: event.latLng.lng(),
                                 time: new Date(),
@@ -186,7 +194,7 @@ function UserCreate() {
                             mapAction(event.latLng.lat(), event.latLng.lng())
                         }}>
                         {markers.map(marker => <Marker key={marker.time.toISOString()} position={{ lat: marker.lat, lng: marker.lng }} />)}
-                    </GoogleMap>
+                    </GoogleMap>,
                 </div>
             </Modal>
 
@@ -279,7 +287,7 @@ function UserCreate() {
 
                                             <div className="flex -mx-3">
                                                 <div className="w-full px-3 mb-5">
-                                                    <button type="submit" onClick={handleSubmit} className="w-full block bg-primary-500 hover:bg-primary-400 focus:bg-primary-400 text-white font-semibold rounded-lg px-4 py-3 mt-6">
+                                                    <button type="submit" onClick={handleSubmit} className="block bg-primary-500 hover:bg-primary-400 focus:bg-primary-400 text-white font-semibold rounded-lg px-4 py-3 mt-6 ml-3">
                                                         Create User
                                                     </button>
                                                 </div>
@@ -305,10 +313,8 @@ function UserCreate() {
     }
 
     return (
-        <div>
-            {Alert(success,msg)}
-            {signUpForm()}
-        </div>
+            <div>{Alert(success,msg)}
+            {signUpForm()}</div>
     );
 }
 

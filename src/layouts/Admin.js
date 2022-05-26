@@ -12,7 +12,7 @@ import routes from "routes.js";
 import sidebarImage from "assets/img/sidebar-3.jpg";
 
 function Admin() {
-  
+
   useEffect(() => {
     localStorage.removeItem('values');
   }, []);

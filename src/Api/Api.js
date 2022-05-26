@@ -10,10 +10,18 @@ export const login = (user) => {
 }
 
 export const registration = (user, token) => {
-
-    console.log("user",user)
-    
     return axios.post(`${API}/User/Registration`, user, {
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`
+        }
+    })
+}
+
+
+export const userList = (token,pageIndex,pageSize) => {
+    
+    return axios.get(`${API}/Admin/getuser?PageNumber=${pageIndex}&PageSize=${pageSize}`, {
         headers: {
             'Content-Type': 'application/json',
             "Authorization": `Bearer ${token}`
