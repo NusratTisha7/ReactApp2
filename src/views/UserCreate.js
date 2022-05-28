@@ -19,6 +19,7 @@ import {
     Flex, Button
 } from '@chakra-ui/react'
 
+let lat = 43.6532, lng = -79.3832
 
 function UserCreate() {
 
@@ -26,7 +27,7 @@ function UserCreate() {
         document.title = 'User Create';
     }, [])
 
-    const btnStyle ={ backgroundColor: "#00004d", color: 'white',marginTop: "500px", padding:'5px 10px'}
+    const btnStyle = { backgroundColor: "#00004d", color: 'white', marginTop: "550px", padding: '5px 10px' }
 
     let [open, setOpen] = useState(false)
     const { token } = userInfo();
@@ -150,9 +151,10 @@ function UserCreate() {
         width: "100vw",
     };
 
+    
     const center = {
-        lat: 43.6532,
-        lng: -79.3832,
+        lat: lat,
+        lng: lng,
     };
 
     const options = {
@@ -168,6 +170,7 @@ function UserCreate() {
     const [markers, setMarkers] = React.useState([]);
 
     function handleChangeLocation(lat, lng) {
+        console.log("cha",lat,lng)
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAX9IFfgZfH0jTzY888Nz-m0ftttvexERw`;
         axios.get(url).then(
             function (response) {
@@ -194,6 +197,8 @@ function UserCreate() {
         handleChangeLocation(lat, lng)
     }
 
+    console.log(lat,lng)
+
     const signUpForm = () => (
         <div>
             <Modal
@@ -203,7 +208,6 @@ function UserCreate() {
                 aria-describedby="modal-modal-description"
             >
                 <div>
-
                     <Flex
                         position='relative'
                         flexDirection='column'
@@ -215,6 +219,8 @@ function UserCreate() {
                             <GoogleMap mapContainerStyle={mapContainerStyle} zoom={8}
                                 center={center} options={options}
                                 onClick={(event) => {
+                                    lat = event.latLng.lat(),
+                                    lng = event.latLng.lng(),
                                     new Date().toISOString
                                     setMarkers([{
                                         lat: event.latLng.lat(),
@@ -228,7 +234,7 @@ function UserCreate() {
                         </Box>
                         <Box >
                             <Button style={btnStyle} colorScheme='pink' type='submit' onClick={handleClose}>
-                               Pick Address
+                                Pick Address
                             </Button>
                         </Box>
                     </Flex>
@@ -304,12 +310,6 @@ function UserCreate() {
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Occupation</label>
-                                                    {/*<input
-                                                    type="text"
-                                                    placeholder="Occupation" autoFocus="autofocus" autoComplete
-                                                    name="ocacupation"
-                                                    value={ocacupation}
-                                                    className="tw_form_input" required onChange={handleChange} /> */}
                                                     <CreatableSelect
                                                         isClearable={true} options={drpDwnOptn} onChange={handleOcupation} />
                                                 </div>
