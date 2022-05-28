@@ -1,8 +1,5 @@
 import jwt_decode from 'jwt-decode';
-import {createContext, useReducer} from "react";
-import {useHistory} from "react-router-dom";
-import React from 'react';
-import moment from "moment";
+
 
 export const authenticate = (token, cb) => {
     const jwt = (JSON.stringify(token));

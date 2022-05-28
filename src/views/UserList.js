@@ -1,105 +1,119 @@
 import React, { useState, useEffect } from 'react';
-import { userList } from '../Api/Api'
+import { userList, userAccess } from '../Api/Api'
 import { userInfo } from '../utils/auth';
 import {
     Card,
-    Table,
-    Container,
-    Row,
-    Col,
+    Table
 } from "react-bootstrap";
+import { Message } from '../utils/alert';
+import Loader from '../components/Loading/loadingModal'
+
+let index = 1
+
 
 function UserList() {
     const { token } = userInfo();
-
-    let [page, setPage] = useState({
-        pageIndex: 1,
-        pageSize: 2
-    })
-
+    let [open,setOpen]=useState(false)
     let [user, setUser] = useState([])
-
-    let { pageIndex, pageSize } = page
+    let [prevDisbale, setPrevDisable] = useState(false)
+    let [nextDisbale, setNextDisable] = useState(false)
 
     useEffect(() => {
         document.title = 'User List';
         getUserList()
     }, [])
 
-    const getUserList = () =>{
-        userList(token, pageIndex, pageSize)
-        .then(res => {
-            setUser(res.data.data)
-        })
+    const getUserList = () => {
+        setOpen(true)
+        userList(token, index, 10)
+            .then(res => {
+                setOpen(false)
+                if (res.data.data.length > 0) {
+                    setUser(res.data.data)
+                } else {
+                    index = index - 1
+                    setNextDisable(true)
+                }
+
+            })
     }
 
-    const prev = () =>{
-        if(pageIndex - 1>0){
-            setPage({
-                ...page,
-                pageIndex: pageIndex - 1
-            })
+    const prev = () => {
+        setNextDisable(false)
+        if (index - 1 > 0) {
+            index -= 1
             getUserList()
         } else {
-            setPage({
-                ...page,
-                pageIndex: 0
-            }) 
+            index = 1
+            setPrevDisable(true)
         }
     }
 
-    const next = () =>{
-        setPage({
-            ...page,
-            pageIndex: pageIndex + 1
-        })
+    const next = () => {
+        setPrevDisable(false)
+        index += 1
         getUserList()
     }
 
-    console.log("page",page)
+    const changeAccess = (access, email) => () => {
+        let data = {
+            "email": email,
+            "isLock": !access
+        }
+        userAccess(data, token)
+            .then(res => {
+                getUserList()
+                Message(true, res.data.message)
+            })
+            .catch(e => {
+                Message(false, 'Something went wrong!')
+            })
+    }
+
 
     return (
         <div>
-            <Table responsive="sm">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Occupation</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {user && user.map((value, index) => (
+            <Loader open={open}/>
+            <Card className='p-5'>
+                <Table responsive="sm">
+                    <thead>
                         <tr>
-                            <td>{index + 1}</td>
-                            <td>{value.data.fullName}</td>
-                            <td>{value.data.email}</td>
-                            <td>{value.data.ocacupation}</td>
-                            <td><button className='btn btn-primary'>Action</button></td>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Occupation</th>
+                            <th></th>
                         </tr>
-                    ))
-                    }
-                </tbody>
-            </Table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item"onClick={prev}>
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                    </li>
-                    
-                    <li class="page-item" onClick={next}>
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                            <span class="sr-only">Next</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+                    </thead>
+                    <tbody>
+                        {user && user.map(value => (
+                            <tr>
+                                <td>{value.data.fullName}</td>
+                                <td>{value.data.email}</td>
+                                <td>{value.data.ocacupation}</td>
+                                {value.lockout && (
+                                    <td><button className='btn btn-primary' onClick={changeAccess(value.lockout, value.email)}>Lock</button></td>
+                                )}
+                                {!value.lockout && (
+                                    <td><button className='btn btn-primary' onClick={changeAccess(value.lockout, value.email)}>UnLock</button></td>
+                                )}
+                                <td><button className='btn btn-primary'>View Chat</button></td>
+                            </tr>
+                        ))
+                        }
+                    </tbody>
+                </Table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item" >
+                            <button disabled={prevDisbale} onClick={prev} class="page-link" aria-label="Previous"> <span aria-hidden="true" >&laquo;</span> </button>
+                        </li>
+
+                        <li class="page-item">
+                            <button class="page-link" aria-label="Previous" disabled={nextDisbale} onClick={next}> <span aria-hidden="true" >&raquo;</span> </button>
+                        </li>
+                    </ul>
+                </nav>
+            </Card>
         </div>
     );
 }

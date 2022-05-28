@@ -1,22 +1,13 @@
-import * as React from 'react';
-import Alert from '@mui/material/Alert';
-import Stack from '@mui/material/Stack';
+import { toast, Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function Message({success, msg}) {
-    if (success) {
-        return (
-            <Stack sx={{ width: '100%' }} spacing={2}>
-                <Alert severity="success">{msg}</Alert>
-            </Stack>
-        );
+toast.configure()
+
+export const Message = ( success, msg ) => {
+    if(success){
+        toast.success(`${msg}`)
     } else {
-       return(
-        <Stack sx={{ width: '100%' }} spacing={2}>
-        <Alert severity="warning">{msg}</Alert>
-    </Stack>
-       )
+        toast.error(`${msg}`)
     }
-
+ 
 }
-
-

@@ -1,26 +1,34 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import FileBase64 from 'react-file-base64';
 import { registration } from '../Api/Api'
 import { userInfo } from '../utils/auth';
-import Modal from '@mui/material/Modal';
+import { Modal } from "@mui/material";
 import {
     GoogleMap,
     useLoadScript,
-    Marker,
-    InfoWindow
+    Marker
 } from "@react-google-maps/api";
 import axios from 'axios';
 import "../components/User/User.css"
-import Message from '../utils/alert'
-import Button from '../components/User/Button'
+import { Message } from '../utils/alert'
+import CreatableSelect from 'react-select/creatable';
+import Loader from '../components/Loading/loadingModal'
+
+import {
+    Box,
+    Flex, Button
+} from '@chakra-ui/react'
 
 
 function UserCreate() {
 
-    useEffect(()=>{ 
-        document.title='User Create'; 
-    },[])
+    useEffect(() => {
+        document.title = 'User Create';
+    }, [])
 
+    const btnStyle ={ backgroundColor: "#00004d", color: 'white',marginTop: "500px", padding:'5px 10px'}
+
+    let [open, setOpen] = useState(false)
     const { token } = userInfo();
     const [map, setMap] = useState(false);
     let [location, setLocation] = useState('Select your location');
@@ -44,7 +52,15 @@ function UserCreate() {
         msg: ''
     });
 
-    const { fullName, email, bDate, password, address, ocacupation, mobile, photo,success,msg } = values;
+    const { fullName, email, bDate, password, address, ocacupation, mobile, photo, success, msg } = values;
+
+    const drpDwnOptn = [
+        { value: 1, label: 'App Developer' },
+        { value: 2, label: 'Web Developer' },
+        { value: 3, label: 'Truck Driver' },
+        { value: 4, label: 'Mechanic' },
+        { value: 5, label: 'Painter' }
+    ]
 
     const handleChange = e => {
         setValues({
@@ -54,9 +70,11 @@ function UserCreate() {
     }
 
     const handleSubmit = e => {
+        setOpen(true)
         e.preventDefault();
         registration({ fullName, email, bDate, address, password, ocacupation, mobile, photo }, token)
             .then(response => {
+                setOpen(false)
                 setValues({
                     fullName: '',
                     email: '',
@@ -73,12 +91,12 @@ function UserCreate() {
                         base64: '',
                         type: ''
                     },
-                    success: true,
-                    msg:'User create successfully'
                 })
+                Message(true, 'User create successfully')
 
             })
             .catch(err => {
+                setOpen(false)
                 setValues({
                     fullName: '',
                     email: '',
@@ -94,10 +112,9 @@ function UserCreate() {
                     photo: {
                         base64: '',
                         type: ''
-                    },
-                    success: false,
-                    msg:'Something went wrong'
+                    }
                 })
+                Message(false, 'Something went wrong')
             })
     }
 
@@ -111,6 +128,15 @@ function UserCreate() {
         })
     }
 
+    const handleOcupation = (e) => {
+        if (e) {
+            setValues({
+                ...values,
+                ocacupation: e.label
+            })
+        }
+
+    }
     const mapModal = () => {
         setMap(true)
     }
@@ -135,7 +161,7 @@ function UserCreate() {
     };
 
     useLoadScript({
-        googleMapsApiKey: "AIzaSyAX9IFfgZfH0jTzY888Nz-m0ftttvexERw",
+        googleMapsApiKey: "AIzaSyCN8snQFg1eriDbdHIgHPWxirZKkz2PKyY",
 
     });
 
@@ -154,8 +180,6 @@ function UserCreate() {
                         long: `${lng}`
                     }
                 })
-                const addr = response.data.results[0].formatted_address;
-                console.log(addr);
             }
         ).catch(
             function (error) {
@@ -168,12 +192,10 @@ function UserCreate() {
 
     const mapAction = (lat, lng) => {
         handleChangeLocation(lat, lng)
-        //setTimeout(handleClose, 2000);
-
     }
 
     const signUpForm = () => (
-        <>
+        <div>
             <Modal
                 open={map}
                 onClose={handleClose}
@@ -181,20 +203,35 @@ function UserCreate() {
                 aria-describedby="modal-modal-description"
             >
                 <div>
-                
-                    <GoogleMap mapContainerStyle={mapContainerStyle} zoom={8} 
-                        center={center} options={options}
-                        onClick={(event) => {
-                            new Date().toISOString
-                            setMarkers([{
-                                lat: event.latLng.lat(),
-                                lng: event.latLng.lng(),
-                                time: new Date(),
-                            }])
-                            mapAction(event.latLng.lat(), event.latLng.lng())
-                        }}>
-                        {markers.map(marker => <Marker key={marker.time.toISOString()} position={{ lat: marker.lat, lng: marker.lng }} />)}
-                    </GoogleMap>,
+
+                    <Flex
+                        position='relative'
+                        flexDirection='column'
+                        alignItems='center'
+                        h='100vh'
+                        w='100vw'
+                    >
+                        <Box position='absolute' left={0} top={0} h='100%' w='100%'>
+                            <GoogleMap mapContainerStyle={mapContainerStyle} zoom={8}
+                                center={center} options={options}
+                                onClick={(event) => {
+                                    new Date().toISOString
+                                    setMarkers([{
+                                        lat: event.latLng.lat(),
+                                        lng: event.latLng.lng(),
+                                        time: new Date(),
+                                    }])
+                                    mapAction(event.latLng.lat(), event.latLng.lng())
+                                }}>
+                                {markers.map(marker => <Marker key={marker.time.toISOString()} position={{ lat: marker.lat, lng: marker.lng }} />)}
+                            </GoogleMap>
+                        </Box>
+                        <Box >
+                            <Button style={btnStyle} colorScheme='pink' type='submit' onClick={handleClose}>
+                               Pick Address
+                            </Button>
+                        </Box>
+                    </Flex>
                 </div>
             </Modal>
 
@@ -246,7 +283,7 @@ function UserCreate() {
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Password</label> <input
                                                     type="password"
-                                                    placeholder="Enter Username" autoFocus="autofocus" autoComplete
+                                                    placeholder="Password" autoFocus="autofocus" autoComplete
                                                     name="password"
                                                     value={password}
                                                     className="tw_form_input" required onChange={handleChange} />
@@ -254,31 +291,34 @@ function UserCreate() {
                                             </div>
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
-                                                <div><label className="block text-gray-700">Photo</label> 
-                                                <FileBase64 type="file" name="photo" accept="image/*" multiple={false} onDone={({ base64 }) => fileBase(base64)} />
+                                                <div><label className="block text-gray-700">Photo</label>
+                                                    <FileBase64 type="file" name="photo" accept="image/*" multiple={false} onDone={({ base64 }) => fileBase(base64)} />
                                                 </div>
                                             </div>
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
-                                                <div><label className="block text-gray-700">Address</label> 
-                                                <p onClick={mapModal}>{location}</p>
+                                                <div><label className="block text-gray-700">Address</label>
+                                                    <p onClick={mapModal}>{location}</p>
                                                 </div>
                                             </div>
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
-                                                <div><label className="block text-gray-700">ocacupation</label> <input
+                                                <div><label className="block text-gray-700">Occupation</label>
+                                                    {/*<input
                                                     type="text"
-                                                    placeholder="ocacupation" autoFocus="autofocus" autoComplete
+                                                    placeholder="Occupation" autoFocus="autofocus" autoComplete
                                                     name="ocacupation"
                                                     value={ocacupation}
-                                                    className="tw_form_input" required onChange={handleChange} />
+                                                    className="tw_form_input" required onChange={handleChange} /> */}
+                                                    <CreatableSelect
+                                                        isClearable={true} options={drpDwnOptn} onChange={handleOcupation} />
                                                 </div>
 
                                             </div>
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Mobile</label> <input
                                                     type="text"
-                                                    placeholder="Enter Username" autoFocus="autofocus" autoComplete
+                                                    placeholder="Mobile" autoFocus="autofocus" autoComplete
                                                     name="mobile"
                                                     value={mobile}
                                                     className="tw_form_input" required onChange={handleChange} />
@@ -300,20 +340,12 @@ function UserCreate() {
                     </div>
                 </div>
             </div >
-        </>
-
+        </div>
     );
 
-    const Alert = (success,msg) => {
-        if(msg!==''){
-            return(
-                <Message success={success} msg={msg}/>
-            )
-        }
-    }
-
     return (
-            <div>{Alert(success,msg)}
+        <div>
+            <Loader open={open} />
             {signUpForm()}</div>
     );
 }

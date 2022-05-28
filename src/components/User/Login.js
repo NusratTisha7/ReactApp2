@@ -1,16 +1,18 @@
-import { useState,useEffect } from 'react';
+import { useState,useEffect  } from 'react';
 import { Grid, Paper, Avatar, TextField, Button } from '@material-ui/core'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { login } from '../../Api/Api'
-import { authenticate,isAuthenticated } from '../../utils/auth';
-import Message from '../../utils/alert'
-import {Redirect} from 'react-router-dom';
+import { authenticate, isAuthenticated } from '../../utils/auth';
+import { Message } from '../../utils/alert'
+import { Redirect } from 'react-router-dom';
+import Loader from '../Loading/loadingModal'
 
 const Login = () => {
 
-    const paperStyle = { padding: 20, height: '70vh', width: 280, margin: "30px auto" }
+    let [open,setOpen]=useState(false)
+    const paperStyle = { padding: 20, height: '60vh', width: 300, margin: "100px auto" }
     const avatarStyle = { backgroundColor: "#527a7a" }
-    const btnStyle = { margin: '20px 0', backgroundColor: "#527a7a" }
+    const btnStyle = { margin: '30px 0', backgroundColor: "#527a7a", color: 'white' }
     const txtFieldstyle = { marginTop: '10px' }
 
     const [loginForm, setLoginForm] = useState({
@@ -20,7 +22,7 @@ const Login = () => {
         msg: ''
     });
 
-    const { email, password,success,msg } = loginForm;
+    const { email, password } = loginForm;
 
     const handleChange = e => {
         setLoginForm({
@@ -29,58 +31,54 @@ const Login = () => {
         })
     }
 
-
     const handleSubmit = e => {
-        e.preventDefault();
-        login({ email, password })
-            .then(response => {
-                authenticate(response.data.token, (success,msg) => {
+        if (email === '' || password === '') {
+            Message(true, 'Please fill in all the required fields')
+        }
+        else {
+            setOpen(true)
+            e.preventDefault();
+            login({ email, password })
+                .then(response => {
+                    setOpen(false)
+                    authenticate(response.data.token, (success, msg) => {
+                        setLoginForm({
+                            email: '',
+                            password: ''
+                        })
+                        Message(true, msg)
+                    })
+                }).catch(e => {
+                    setOpen(false)
                     setLoginForm({
                         email: '',
-                        password: '',
-                        success: success,
-                        msg:msg
+                        password: ''
                     })
+                    Message(false, 'Invalid Credentials')
                 })
-            }).catch(e=>{
-                setLoginForm({
-                    email: '',
-                    password: '',
-                    success: false,
-                    msg:'Invalid Credentials'
-                })
-            })
+        }
     }
 
-    
+
     const signInForm = () => (
         <Grid>
             <Paper elevation={10} style={paperStyle}>
-                <Grid align='center'>
+                <Grid align='center' className='mt-3'>
                     <Avatar style={avatarStyle}><LockOutlinedIcon /></Avatar>
-                    <h2>Login</h2>
+                    <h1 class="text-xl md:text-2xl font-bold leading-tight mt-2">Log In</h1>
                 </Grid>
 
-                <TextField label='username' name="email" value={email} placeholder='Enter username' fullWidth required onChange={handleChange} />
-                <TextField label='Password' name="password" value={password} placeholder='Enter password' type='password' fullWidth required style={txtFieldstyle} onChange={handleChange} />
+                <TextField label='Email' name="email" value={email} fullWidth required onChange={handleChange} />
+                <TextField label='Password' name="password" value={password} type='password' fullWidth required style={txtFieldstyle} onChange={handleChange} />
                 <Button type='submit' variant='contained' fullWidth style={btnStyle} onClick={handleSubmit}>Login</Button>
             </Paper>
         </Grid>
     )
 
-   
-    const Alert = (success,msg) => {
-        if(msg!==''){
-            return(
-                <Message success={success} msg={msg}/>
-            )
-        }
-    }
-
     return (
         <div>
-            {isAuthenticated() ? <Redirect to="/admin"/> : ""}
-            {Alert(success,msg)}
+            <Loader open={open}/>
+            {isAuthenticated() ? <Redirect to="/admin" /> : ""}
             {signInForm()}
         </div>
     )

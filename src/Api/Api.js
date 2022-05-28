@@ -19,12 +19,19 @@ export const registration = (user, token) => {
 }
 
 
-export const userList = (token,pageIndex,pageSize) => {
-    
-    return axios.get(`${API}/Admin/getuser?PageNumber=${pageIndex}&PageSize=${pageSize}`, {
+export const userList = (token, pageIndex, pageSize) => {
+    return axios.get(`${API}/Admin/getuser?PageNumber=${pageIndex}&PageSize=10`, {
         headers: {
             'Content-Type': 'application/json',
             "Authorization": `Bearer ${token}`
+        }
+    })
+}
+
+export const userAccess = (data) => {
+    return axios.post(`${API}/Admin/setUserAccess`, data, {
+        headers: {
+            'Content-Type': 'application/json'
         }
     })
 }
