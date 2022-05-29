@@ -35,3 +35,14 @@ export const userAccess = (data) => {
         }
     })
 }
+
+export const getChats = (email) => {
+    let data = {
+        "email": email
+      }
+    return axios.post(`${API}/Admin/getChats`, data,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}

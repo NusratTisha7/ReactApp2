@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { userList, userAccess } from '../Api/Api'
-import { userInfo } from '../utils/auth';
+import { userList, userAccess, getChats } from '../Api/Api'
+import { userInfo} from '../utils/auth';
 import {
     Card,
     Table
@@ -71,6 +71,11 @@ function UserList() {
     }
 
 
+    const viewChat = (email) => () =>{
+        getChats(email,token)
+        .then(res=>console.log(res))
+    }
+
     return (
         <div>
             <Loader open={open}/>
@@ -96,7 +101,7 @@ function UserList() {
                                 {!value.lockout && (
                                     <td><button className='btn btn-primary' onClick={changeAccess(value.lockout, value.email)}>UnLock</button></td>
                                 )}
-                                <td><button className='btn btn-primary'>View Chat</button></td>
+                                <td><button className='btn btn-primary' onClick={viewChat(value.data.email)}>View Chat</button></td>
                             </tr>
                         ))
                         }

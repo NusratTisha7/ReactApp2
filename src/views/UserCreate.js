@@ -12,20 +12,25 @@ import axios from 'axios';
 import "../components/User/User.css"
 import { Message } from '../utils/alert'
 import CreatableSelect from 'react-select/creatable';
-import Loader from '../components/Loading/loadingModal'
-
+import Loader from '../components/Loading/loadingModal';
 import {
     Box,
     Flex, Button
 } from '@chakra-ui/react'
-
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import moment from "moment";
 let lat = 43.6532, lng = -79.3832
 
 function UserCreate() {
 
+    const [value, setValue] = React.useState(new Date());
+
     useEffect(() => {
         document.title = 'User Create';
     }, [])
+
 
     const btnStyle = { backgroundColor: "#00004d", color: 'white', marginTop: "550px", padding: '5px 10px' }
 
@@ -64,6 +69,7 @@ function UserCreate() {
     ]
 
     const handleChange = e => {
+        console.log("e",e)
         setValues({
             ...values,
             [e.target.name]: e.target.value
@@ -151,7 +157,7 @@ function UserCreate() {
         width: "100vw",
     };
 
-    
+
     const center = {
         lat: lat,
         lng: lng,
@@ -170,7 +176,7 @@ function UserCreate() {
     const [markers, setMarkers] = React.useState([]);
 
     function handleChangeLocation(lat, lng) {
-        console.log("cha",lat,lng)
+        console.log("cha", lat, lng)
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAX9IFfgZfH0jTzY888Nz-m0ftttvexERw`;
         axios.get(url).then(
             function (response) {
@@ -197,8 +203,15 @@ function UserCreate() {
         handleChangeLocation(lat, lng)
     }
 
-    console.log(lat,lng)
-
+    
+    const handleDate = (e) =>{
+        let date = moment(e).format('l').split("/")
+        setValues({
+            ...values,
+            bDate : `${date[2]}-${date[0]}-${date[1]}`
+        })
+    }
+    
     const signUpForm = () => (
         <div>
             <Modal
@@ -220,8 +233,8 @@ function UserCreate() {
                                 center={center} options={options}
                                 onClick={(event) => {
                                     lat = event.latLng.lat(),
-                                    lng = event.latLng.lng(),
-                                    new Date().toISOString
+                                        lng = event.latLng.lng(),
+                                        new Date().toISOString
                                     setMarkers([{
                                         lat: event.latLng.lat(),
                                         lng: event.latLng.lng(),
@@ -277,13 +290,20 @@ function UserCreate() {
                                                 </div>
                                             </div>
                                             <div className="w-full md:w-1/2 px-3 mb-5">
-                                                <div><label className="block text-gray-700">Date of Birth</label> <input
-                                                    type="date"
-                                                    value={bDate}
-                                                    name="bDate"
-                                                    className="tw_form_input" required
-                                                    onChange={handleChange}
-                                                />
+                                                <div><label className="block text-gray-700">Date of Birth</label>
+                                                    <LocalizationProvider dateAdapter={AdapterDateFns} >
+                                                        <DatePicker
+                                                            label="Custom input"
+                                                            value={value}
+                                                            onChange={handleDate}
+                                                            renderInput={({ inputRef, inputProps, InputProps }) => (
+                                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                                    <input ref={inputRef} {...inputProps} className="tw_form_input" required/>
+                                                                    {InputProps?.endAdornment}
+                                                                </Box>
+                                                            )}
+                                                        />
+                                                    </LocalizationProvider>
                                                 </div>
                                             </div>
                                             <div className="w-full md:w-1/2 px-3 mb-5">
@@ -304,7 +324,9 @@ function UserCreate() {
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Address</label>
-                                                    <p onClick={mapModal}>{location}</p>
+                                                    <input
+                                                    value={location}
+                                                    className="tw_form_input" required onChange={mapModal} />
                                                 </div>
                                             </div>
 
@@ -351,3 +373,4 @@ function UserCreate() {
 }
 
 export default UserCreate;
+
