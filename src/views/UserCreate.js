@@ -25,8 +25,6 @@ let lat = 43.6532, lng = -79.3832
 
 function UserCreate() {
 
-    const [value, setValue] = React.useState(new Date());
-
     useEffect(() => {
         document.title = 'User Create';
     }, [])
@@ -69,7 +67,6 @@ function UserCreate() {
     ]
 
     const handleChange = e => {
-        console.log("e",e)
         setValues({
             ...values,
             [e.target.name]: e.target.value
@@ -203,7 +200,6 @@ function UserCreate() {
         handleChangeLocation(lat, lng)
     }
 
-    
     const handleDate = (e) =>{
         let date = moment(e).format('l').split("/")
         setValues({
@@ -294,7 +290,7 @@ function UserCreate() {
                                                     <LocalizationProvider dateAdapter={AdapterDateFns} >
                                                         <DatePicker
                                                             label="Custom input"
-                                                            value={value}
+                                                            value={bDate}
                                                             onChange={handleDate}
                                                             renderInput={({ inputRef, inputProps, InputProps }) => (
                                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
