@@ -21,6 +21,11 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import moment from "moment";
+import PlacesAutocomplete, {
+    geocodeByAddress,
+    getLatLng,
+} from 'react-places-autocomplete';
+
 let lat = 43.6532, lng = -79.3832
 
 function UserCreate() {
@@ -30,12 +35,26 @@ function UserCreate() {
     }, [])
 
 
+    const handleSelect = async value => {
+        const results = await geocodeByAddress(value);
+        const latLng = await getLatLng(results[0]);
+        setLocation(value);
+        setValues({
+            ...values,
+            address: {
+                address: value,
+                lat: `${latLng.lat}`,
+                long: `${latLng.lng}`
+            }
+        })
+    };
+
     const btnStyle = { backgroundColor: "#00004d", color: 'white', marginTop: "550px", padding: '5px 10px' }
 
     let [open, setOpen] = useState(false)
     const { token } = userInfo();
     const [map, setMap] = useState(false);
-    let [location, setLocation] = useState('Select your location');
+    let [location, setLocation] = useState('');
     const [values, setValues] = useState({
         fullName: '',
         email: '',
@@ -97,6 +116,7 @@ function UserCreate() {
                     },
                 })
                 Message(true, 'User create successfully')
+                setLocation('')
 
             })
             .catch(err => {
@@ -173,7 +193,6 @@ function UserCreate() {
     const [markers, setMarkers] = React.useState([]);
 
     function handleChangeLocation(lat, lng) {
-        console.log("cha", lat, lng)
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAX9IFfgZfH0jTzY888Nz-m0ftttvexERw`;
         axios.get(url).then(
             function (response) {
@@ -200,14 +219,14 @@ function UserCreate() {
         handleChangeLocation(lat, lng)
     }
 
-    const handleDate = (e) =>{
-        let date = moment(e).format('l').split("/")
+    const handleDate = (e) => {
+        let date = moment(e).format('YYYY-MM-DD')
         setValues({
             ...values,
-            bDate : `${date[2]}-${date[0]}-${date[1]}`
-        })
+            bDate: date
+        });
     }
-    
+
     const signUpForm = () => (
         <div>
             <Modal
@@ -294,7 +313,7 @@ function UserCreate() {
                                                             onChange={handleDate}
                                                             renderInput={({ inputRef, inputProps, InputProps }) => (
                                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                    <input ref={inputRef} {...inputProps} className="tw_form_input" required/>
+                                                                    <input ref={inputRef} {...inputProps} className="tw_form_input" required />
                                                                     {InputProps?.endAdornment}
                                                                 </Box>
                                                             )}
@@ -320,9 +339,40 @@ function UserCreate() {
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Address</label>
-                                                    <input
-                                                    value={location}
-                                                    className="tw_form_input" required onChange={mapModal} />
+
+                                                    <PlacesAutocomplete
+                                                        value={location}
+                                                        onChange={setLocation}
+                                                        onSelect={handleSelect}
+                                                    >
+                                                        {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                                                            <div>
+                                                                <input
+                                                                    {...getInputProps({
+                                                                        placeholder: 'Type address'
+                                                                    })} className="tw_form_input"
+                                                                />
+                                                                <div>
+                                                                    {loading ? <div>...loading</div> : null}
+
+                                                                    {suggestions.map(suggestion => {
+                                                                        const style = {
+                                                                            backgroundColor: suggestion.active ? "#cccccc" : "#fff",
+                                                                            color: "black",
+                                                                            fontSize: '.8rem'
+                                                                        };
+
+                                                                        return (
+                                                                            <div {...getSuggestionItemProps(suggestion, { style })}>
+                                                                                {suggestion.description}
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </PlacesAutocomplete>
+                                                    <p onClick={mapModal} className='mt-3' style={{ color: '#001D5F', fontSize: 'bold' }}>Select from map</p>
                                                 </div>
                                             </div>
 

@@ -25,13 +25,10 @@ export const isAuthenticated = () => {
                 return true;
             } else {
                 localStorage.removeItem('jwt');
-                checkLoggedInUser()
                 return false
             }
         } else{
             localStorage.clear()
-            console.log(role)
-            checkLoggedInUser()
         }
     } else return false;
 }
