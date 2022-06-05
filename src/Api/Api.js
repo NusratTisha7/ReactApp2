@@ -37,13 +37,24 @@ export const userAccess = (data) => {
     })
 }
 
-export const getChats = (email) => {
+export const getChats = (email, token) => {
     let data = {
         "email": email
       }
     return axios.post(`${API}/Admin/getChats`, data,{
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`
+        }
+    })
+}
+
+export const chatList = (id,mail) => {
+    const token = JSON.parse(localStorage.getItem('jwt'))
+    return axios.get(`${API}/Admin/chatfromroom?roomID=${id}&email=${mail}`,{
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`
         }
     })
 }

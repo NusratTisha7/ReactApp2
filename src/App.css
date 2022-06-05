@@ -1,0 +1,16 @@
+.avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+.avatar_img{
+    clip-path: circle();
+}
+
+.scroll{
+    overflow: scroll;
+}
+
+.chat_item{
+    cursor: pointer;
+}
