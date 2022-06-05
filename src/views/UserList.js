@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { userList, userAccess, getChats } from '../Api/Api'
+import { userList, userAccess, getChats, deleteUser } from '../Api/Api'
 import { userInfo } from '../utils/auth';
 import {
     Card,
@@ -14,10 +14,7 @@ import moment from "moment";
 import {useHistory} from "react-router-dom";
 import Card2 from '@mui/material/Card';
 import { ImageUrl } from '../utils/config';
-
 let index = 1
-
-let open2 = false
 
 function UserList() {
     const { token } = userInfo();
@@ -87,10 +84,6 @@ function UserList() {
         getChats(email, token)
             .then(res => setChatList(res.data))
     }
-
-
-    console.log("setChatList", chatList)
-
    
     const viewHistory = (user) => () =>{
         setModal(false)
@@ -99,19 +92,36 @@ function UserList() {
         });
     }
 
+    const userDelete = (email) => () =>{
+        deleteUser(email)
+        .then(res=>{
+            getUserList()
+            Message(true, 'User delete successfully')
+        })
+        .catch(e => {
+            Message(false, 'Something went wrong!')
+        })
+    }
+
+    const modalClose = () =>{
+        setModal(false)
+    }
+
     return (
         <div>
             <Modal
                 aria-labelledby="zoom-modal-title"
                 aria-describedby="zoom-modal-description"
                 open={modal}
+                onClose={() => {
+                    modalClose()
+                  }}
                 style={{ outline: 0 }}
             >
-                <div
-                    className='modal-dialog-scrollable modal-dialog modal-dialog-centered swal2-modal swal2-popup swal2-show modal-lg'>
+                <div className='modal-dialog-scrollable modal-dialog modal-dialog-centered swal2-modal swal2-popup swal2-show modal-lg'>
                     <div className="modal-content kt-iconbox  p-2">
                         {chatList.length===0 &&(
-                            <div>Not List Available</div>
+                            <div style={{padding:'50px',textAlign:'center'}}>No chats yet</div>
                         )}
                         {chatList.map(list =>
                         (
@@ -146,6 +156,8 @@ function UserList() {
                             <th>Email</th>
                             <th>Occupation</th>
                             <th></th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -161,6 +173,7 @@ function UserList() {
                                     <td><button className='btn btn-primary' onClick={changeAccess(value.lockout, value.email)}>UnLock</button></td>
                                 )}
                                 <td><button className='btn btn-primary' onClick={viewChat(value.data.email)}>View Chat</button></td>
+                                <td><button className='btn btn-primary' onClick={userDelete(value.data.email)}>Delete</button></td>
                             </tr>
                         ))
                         }

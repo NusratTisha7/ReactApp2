@@ -1,4 +1,4 @@
-import React, {  useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./chatContent.css";
 import ChatItem from "./ChatItem";
 import { chatList } from '../../Api/Api'
@@ -9,6 +9,11 @@ function ChatContent() {
 
   const [chat, setChat] = useState([])
 
+  const [currentUser, setCurrentUser] = useState({
+    name: '',
+    img: ''
+  })
+
   const { id, mail } = useParams()
 
   useEffect(() => {
@@ -16,19 +21,29 @@ function ChatContent() {
     chatList(id, mail)
       .then(res => {
         setChat(res.data.msgList)
+        console.log("19", res.data.msgList)
+        for (let user of res.data.msgList) {
+          if (user.email === mail) {
+            setCurrentUser({
+              name: user.name,
+              img: user.imgURL
+            })
+            break;
+          }
+        }
       })
   }, [])
+
 
   return (
     <div className="main__chatcontent">
       <div className="content__header">
         <div>
           <div className="current-chatting-user">
-
-            <div className="avatar">
-              <img src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg" className='avatar_img' alt="#" />
-            </div>
-            <p>auereseis</p>
+              <div className="avatar">
+                <img src={`${ImageUrl}/${currentUser.img}`} className='avatar_img' alt="#" />
+              </div>
+            <p style={{ marginLeft: '5px' }}>{currentUser.name}</p>
           </div>
         </div>
 

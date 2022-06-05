@@ -58,3 +58,13 @@ export const chatList = (id,mail) => {
         }
     })
 }
+
+export const deleteUser = (email) => {
+    const token = JSON.parse(localStorage.getItem('jwt'))
+    return axios.delete(`${API}/Admin/deleteuser?email=${email}`,{
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`
+        }
+    })
+}
