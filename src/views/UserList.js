@@ -22,6 +22,7 @@ let open2 = false
 function UserList() {
     const { token } = userInfo();
     let [open, setOpen] = useState(false)
+    let [modal, setModal] = useState(false)
     let [user, setUser] = useState([])
     let [prevDisbale, setPrevDisable] = useState(false)
     let [nextDisbale, setNextDisable] = useState(false)
@@ -82,7 +83,7 @@ function UserList() {
 
 
     const viewChat = (email) => () => {
-        open2 = true
+        setModal(true)
         getChats(email, token)
             .then(res => setChatList(res.data))
     }
@@ -92,6 +93,7 @@ function UserList() {
 
    
     const viewHistory = (user) => () =>{
+        setModal(false)
         history.push({
             pathname: `/Chat_history/${user.chatRoom.id}/${user.email}`,
         });
@@ -102,12 +104,15 @@ function UserList() {
             <Modal
                 aria-labelledby="zoom-modal-title"
                 aria-describedby="zoom-modal-description"
-                open={open2}
+                open={modal}
                 style={{ outline: 0 }}
             >
                 <div
                     className='modal-dialog-scrollable modal-dialog modal-dialog-centered swal2-modal swal2-popup swal2-show modal-lg'>
                     <div className="modal-content kt-iconbox  p-2">
+                        {chatList.length===0 &&(
+                            <div>Not List Available</div>
+                        )}
                         {chatList.map(list =>
                         (
                             <Card2 className='mt-2'>

@@ -1,6 +1,5 @@
-import Avatar from "./Avatar";
 
-function ChatItem({ animationDelay, key, user, msg, image }) {
+function ChatItem({  user, msg, image }) {
 
   return (
     <div
@@ -10,7 +9,7 @@ function ChatItem({ animationDelay, key, user, msg, image }) {
       <div className="chat__item__content mt-3">
         <div className="chat__msg">{msg}</div>
       </div>
-      {/* <Avatar isOnline="active" image={image} /> */}
+     
       <div className="avatar">
         <img src={image} className='avatar_img' alt="#" />
       </div>
