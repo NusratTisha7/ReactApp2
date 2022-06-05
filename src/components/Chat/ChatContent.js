@@ -25,10 +25,10 @@ const { id,mail } = useParams()
       <div className="content__header">
         <div>
           <div className="current-chatting-user">
-            <Avatar
-              isOnline="active"
-              image="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg"
-            />
+            
+            <div className="avatar">
+                                    <img src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg" className='avatar_img' alt="#" />
+                                </div>
             <p>auereseis</p>
           </div>
         </div>
