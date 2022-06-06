@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FileBase64 from 'react-file-base64';
 import { registration } from '../Api/Api'
 import { userInfo } from '../utils/auth';
@@ -34,6 +34,7 @@ function UserCreate() {
         document.title = 'User Create';
     }, [])
 
+    const selectInputRef = useRef();
 
     const handleSelect = async value => {
         const results = await geocodeByAddress(value);
@@ -93,6 +94,7 @@ function UserCreate() {
     }
 
     const handleSubmit = e => {
+        console.log("e",e.target)
         setOpen(true)
         e.preventDefault();
         registration({ fullName, email, bDate, address, password, ocacupation, mobile, photo }, token)
@@ -117,9 +119,12 @@ function UserCreate() {
                 })
                 Message(true, 'User create successfully')
                 setLocation('')
-
+                document.getElementById('map').value = ''
+                document.getElementById('date').value = ''
+                selectInputRef.current.clearValue();
             })
             .catch(err => {
+                console.log(err)
                 setOpen(false)
                 setValues({
                     fullName: '',
@@ -139,8 +144,14 @@ function UserCreate() {
                     }
                 })
                 Message(false, 'Something went wrong')
+                setLocation('')
+                document.getElementById('map').value = ''
+                document.getElementById('date').value = ''
+                selectInputRef.current.clearValue();
             })
+            
     }
+
 
     const fileBase = (base64) => {
         setValues({
@@ -226,6 +237,7 @@ function UserCreate() {
             bDate: date
         });
     }
+
 
     const signUpForm = () => (
         <div>
@@ -313,7 +325,7 @@ function UserCreate() {
                                                             onChange={handleDate}
                                                             renderInput={({ inputRef, inputProps, InputProps }) => (
                                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                    <input ref={inputRef} {...inputProps} className="tw_form_input" required />
+                                                                    <input ref={inputRef} {...inputProps} className="tw_form_input" id='date' required />
                                                                     {InputProps?.endAdornment}
                                                                 </Box>
                                                             )}
@@ -350,7 +362,7 @@ function UserCreate() {
                                                                 <input
                                                                     {...getInputProps({
                                                                         placeholder: 'Type address'
-                                                                    })} className="tw_form_input"
+                                                                    })} className="tw_form_input" id="map"
                                                                 />
                                                                 <div>
                                                                     {loading ? <div>...loading</div> : null}
@@ -372,13 +384,14 @@ function UserCreate() {
                                                             </div>
                                                         )}
                                                     </PlacesAutocomplete>
-                                                    <p onClick={mapModal} className='mt-3' style={{ color: '#001D5F', fontSize: 'bold' }}>Select from map</p>
+                                                    <p onClick={mapModal} className='mt-3' style={{ color: '#001D5F', fontSize: 'bold', cursor: 'pointer' }}>Select from map</p>
                                                 </div>
                                             </div>
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Occupation</label>
                                                     <CreatableSelect
+                                                        ref={selectInputRef}
                                                         isClearable={true} options={drpDwnOptn} onChange={handleOcupation} />
                                                 </div>
 
