@@ -11,7 +11,7 @@ import {
     Modal
 } from "@material-ui/core";
 import moment from "moment";
-import {useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import Card2 from '@mui/material/Card';
 import { ImageUrl } from '../utils/config';
 let index = 1
@@ -84,27 +84,34 @@ function UserList() {
         getChats(email, token)
             .then(res => setChatList(res.data))
     }
-   
-    const viewHistory = (user) => () =>{
+
+    const viewHistory = (user) => () => {
         setModal(false)
         history.push({
             pathname: `/Chat_history/${user.chatRoom.id}/${user.email}`,
         });
     }
 
-    const userDelete = (email) => () =>{
+    const userDelete = (email) => () => {
         deleteUser(email)
-        .then(res=>{
-            getUserList()
-            Message(true, 'User delete successfully')
-        })
-        .catch(e => {
-            Message(false, 'Something went wrong!')
-        })
+            .then(res => {
+                getUserList()
+                Message(true, 'User delete successfully')
+            })
+            .catch(e => {
+                Message(false, 'Something went wrong!')
+            })
     }
 
-    const modalClose = () =>{
+    const modalClose = () => {
         setModal(false)
+    }
+
+    const userEdit = (user) => () => {
+        localStorage.setItem('user',JSON.stringify(user))
+        history.push({
+            pathname: '/edit',
+        });
     }
 
     return (
@@ -115,32 +122,32 @@ function UserList() {
                 open={modal}
                 onClose={() => {
                     modalClose()
-                  }}
+                }}
                 style={{ outline: 0 }}
             >
                 <div className='modal-dialog-scrollable modal-dialog modal-dialog-centered swal2-modal swal2-popup swal2-show modal-lg'>
                     <div className="modal-content kt-iconbox  p-2">
-                        {chatList.length===0 &&(
-                            <div style={{padding:'50px',textAlign:'center'}}>No chats yet</div>
+                        {chatList.length === 0 && (
+                            <div style={{ padding: '50px', textAlign: 'center' }}>No chats yet</div>
                         )}
                         {chatList.map(list =>
                         (
                             <Card2 className='mt-2'>
                                 <div className='d-flex p-2 chat_item mt-3' onClick={viewHistory(list)}>
-                                {list.imgURL && (
-                                    <div className="avatar">
-                                    <img src={`${ImageUrl}/${list.imgURL}`} className='avatar_img' alt="#" />
+                                    {list.imgURL && (
+                                        <div className="avatar">
+                                            <img src={`${ImageUrl}/${list.imgURL}`} className='avatar_img' alt="#" />
+                                        </div>
+                                    )}
+
+                                    <div className="m-2">
+                                        <p>{list.name}</p>
+                                        <span>{list.chat.message}</span>
+                                    </div>
+                                    <div className='mt-2 mr-5'>
+                                        <span>{moment(list.chat.dateTime).format('YYYY-MM-DD')}</span>
+                                    </div>
                                 </div>
-                                )}
-                                
-                                <div className="m-2">
-                                    <p>{list.name}</p>
-                                    <span>{list.chat.message}</span>
-                                </div>
-                                <div className='mt-2 mr-5'>
-                                  <span>{moment(list.chat.dateTime).format('YYYY-MM-DD')}</span>
-                                </div>
-                            </div>
                             </Card2>
                         )
                         )}
@@ -155,6 +162,7 @@ function UserList() {
                             <th>Name</th>
                             <th>Email</th>
                             <th>Occupation</th>
+                            <th></th>
                             <th></th>
                             <th></th>
                             <th></th>
@@ -174,6 +182,7 @@ function UserList() {
                                 )}
                                 <td><button className='btn btn-primary' onClick={viewChat(value.data.email)}>View Chat</button></td>
                                 <td><button className='btn btn-primary' onClick={userDelete(value.data.email)}>Delete</button></td>
+                                <td><button className='btn btn-primary' onClick={userEdit(value)}>Edit</button></td>
                             </tr>
                         ))
                         }

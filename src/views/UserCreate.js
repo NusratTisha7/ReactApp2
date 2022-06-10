@@ -2,20 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import FileBase64 from 'react-file-base64';
 import { registration } from '../Api/Api'
 import { userInfo } from '../utils/auth';
-import { Modal } from "@mui/material";
-import {
-    GoogleMap,
-    useLoadScript,
-    Marker
-} from "@react-google-maps/api";
-import axios from 'axios';
 import "../components/User/User.css"
 import { Message } from '../utils/alert'
 import CreatableSelect from 'react-select/creatable';
 import Loader from '../components/Loading/loadingModal';
 import {
     Box,
-    Flex, Button
 } from '@chakra-ui/react'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -25,32 +17,14 @@ import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
+import GoogleMapModal from '../components/GoogleMap/GoogleMapModal'
 
-let lat = 43.6532, lng = -79.3832
 
 function UserCreate() {
 
     useEffect(() => {
         document.title = 'User Create';
     }, [])
-
-    const selectInputRef = useRef();
-
-    const handleSelect = async value => {
-        const results = await geocodeByAddress(value);
-        const latLng = await getLatLng(results[0]);
-        setLocation(value);
-        setValues({
-            ...values,
-            address: {
-                address: value,
-                lat: `${latLng.lat}`,
-                long: `${latLng.lng}`
-            }
-        })
-    };
-
-    const btnStyle = { backgroundColor: "#00004d", color: 'white', marginTop: "550px", padding: '5px 10px' }
 
     let [open, setOpen] = useState(false)
     const { token } = userInfo();
@@ -76,8 +50,10 @@ function UserCreate() {
         msg: ''
     });
 
-    const { fullName, email, bDate, password, address, ocacupation, mobile, photo, success, msg } = values;
+    let { fullName, email, bDate, password, address, ocacupation, mobile, photo, success, msg } = values;
 
+    const selectInputRef = useRef();
+    
     const drpDwnOptn = [
         { value: 1, label: 'App Developer' },
         { value: 2, label: 'Web Developer' },
@@ -94,9 +70,11 @@ function UserCreate() {
     }
 
     const handleSubmit = e => {
-        console.log("e",e.target)
         setOpen(true)
         e.preventDefault();
+        if(mobile!==''){
+            email=mobile
+        }
         registration({ fullName, email, bDate, address, password, ocacupation, mobile, photo }, token)
             .then(response => {
                 setOpen(false)
@@ -119,12 +97,12 @@ function UserCreate() {
                 })
                 Message(true, 'User create successfully')
                 setLocation('')
+                e.target.reset()
                 document.getElementById('map').value = ''
                 document.getElementById('date').value = ''
                 selectInputRef.current.clearValue();
             })
             .catch(err => {
-                console.log(err)
                 setOpen(false)
                 setValues({
                     fullName: '',
@@ -145,12 +123,27 @@ function UserCreate() {
                 })
                 Message(false, 'Something went wrong')
                 setLocation('')
+                e.target.reset()
                 document.getElementById('map').value = ''
                 document.getElementById('date').value = ''
                 selectInputRef.current.clearValue();
             })
-            
     }
+
+
+    const handleSelect = async value => {
+        const results = await geocodeByAddress(value);
+        const latLng = await getLatLng(results[0]);
+        setLocation(value);
+        setValues({
+            ...values,
+            address: {
+                address: value,
+                lat: `${latLng.lat}`,
+                long: `${latLng.lng}`
+            }
+        })
+    };
 
 
     const fileBase = (base64) => {
@@ -170,65 +163,18 @@ function UserCreate() {
                 ocacupation: e.label
             })
         }
-
     }
+
+
     const mapModal = () => {
         setMap(true)
     }
+
 
     const handleClose = () => {
         setMap(false)
     }
 
-    const mapContainerStyle = {
-        height: "100vh",
-        width: "100vw",
-    };
-
-
-    const center = {
-        lat: lat,
-        lng: lng,
-    };
-
-    const options = {
-        disableDefaultUI: true,
-        zoomControl: true,
-    };
-
-    useLoadScript({
-        googleMapsApiKey: "AIzaSyCN8snQFg1eriDbdHIgHPWxirZKkz2PKyY",
-
-    });
-
-    const [markers, setMarkers] = React.useState([]);
-
-    function handleChangeLocation(lat, lng) {
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAX9IFfgZfH0jTzY888Nz-m0ftttvexERw`;
-        axios.get(url).then(
-            function (response) {
-                setLocation(response.data.results[0].formatted_address)
-                setValues({
-                    ...values,
-                    address: {
-                        address: response.data.results[0].formatted_address,
-                        lat: `${lat}`,
-                        long: `${lng}`
-                    }
-                })
-            }
-        ).catch(
-            function (error) {
-                console.log(error);
-            }
-        ).then(function () {
-
-        })
-    }
-
-    const mapAction = (lat, lng) => {
-        handleChangeLocation(lat, lng)
-    }
 
     const handleDate = (e) => {
         let date = moment(e).format('YYYY-MM-DD')
@@ -238,49 +184,22 @@ function UserCreate() {
         });
     }
 
+    const handleLocation = (address, lat, lng) => {
+        setLocation(address)
+        setValues({
+            ...values,
+            address: {
+                address: address,
+                lat: `${lat}`,
+                long: `${lng}`
+            }
+        })
+    }
+
 
     const signUpForm = () => (
         <div>
-            <Modal
-                open={map}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <div>
-                    <Flex
-                        position='relative'
-                        flexDirection='column'
-                        alignItems='center'
-                        h='100vh'
-                        w='100vw'
-                    >
-                        <Box position='absolute' left={0} top={0} h='100%' w='100%'>
-                            <GoogleMap mapContainerStyle={mapContainerStyle} zoom={8}
-                                center={center} options={options}
-                                onClick={(event) => {
-                                    lat = event.latLng.lat(),
-                                        lng = event.latLng.lng(),
-                                        new Date().toISOString
-                                    setMarkers([{
-                                        lat: event.latLng.lat(),
-                                        lng: event.latLng.lng(),
-                                        time: new Date(),
-                                    }])
-                                    mapAction(event.latLng.lat(), event.latLng.lng())
-                                }}>
-                                {markers.map(marker => <Marker key={marker.time.toISOString()} position={{ lat: marker.lat, lng: marker.lng }} />)}
-                            </GoogleMap>
-                        </Box>
-                        <Box >
-                            <Button style={btnStyle} colorScheme='pink' type='submit' onClick={handleClose}>
-                                Pick Address
-                            </Button>
-                        </Box>
-                    </Flex>
-                </div>
-            </Modal>
-
+            <GoogleMapModal map={map} handleClose={handleClose} handleLocation={handleLocation} />
             <div className="mx-auto" data-v-791b20d9>
                 <div data-v-791b20d9>
                     <div data-v-791b20d9>
@@ -307,15 +226,7 @@ function UserCreate() {
                                                     className="tw_form_input" required onChange={handleChange} />
                                                 </div>
                                             </div>
-                                            <div className="w-full md:w-1/2 px-3 mb-5">
-                                                <div><label className="block text-gray-700">Email</label> <input
-                                                    type="text"
-                                                    placeholder="Email" autoFocus="autofocus" autoComplete
-                                                    name="email"
-                                                    value={email}
-                                                    className="tw_form_input" required onChange={handleChange} />
-                                                </div>
-                                            </div>
+                                            
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Date of Birth</label>
                                                     <LocalizationProvider dateAdapter={AdapterDateFns} >
@@ -325,7 +236,7 @@ function UserCreate() {
                                                             onChange={handleDate}
                                                             renderInput={({ inputRef, inputProps, InputProps }) => (
                                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                    <input ref={inputRef} {...inputProps} className="tw_form_input" id='date' required />
+                                                                    <input  {...inputProps} className="tw_form_input" id='date' required />
                                                                     {InputProps?.endAdornment}
                                                                 </Box>
                                                             )}
@@ -345,7 +256,7 @@ function UserCreate() {
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Photo</label>
-                                                    <FileBase64 type="file" name="photo" accept="image/*" multiple={false} onDone={({ base64 }) => fileBase(base64)} />
+                                                    <FileBase64 type="file" name="photo" accept="image/*" required multiple={false} onDone={({ base64 }) => fileBase(base64)} />
                                                 </div>
                                             </div>
 
@@ -363,11 +274,13 @@ function UserCreate() {
                                                                     {...getInputProps({
                                                                         placeholder: 'Type address'
                                                                     })} className="tw_form_input" id="map"
+                                                                    required
                                                                 />
                                                                 <div>
                                                                     {loading ? <div>...loading</div> : null}
 
                                                                     {suggestions.map(suggestion => {
+                                                                        console.log("suggestion",suggestion)
                                                                         const style = {
                                                                             backgroundColor: suggestion.active ? "#cccccc" : "#fff",
                                                                             color: "black",
@@ -390,8 +303,7 @@ function UserCreate() {
 
                                             <div className="w-full md:w-1/2 px-3 mb-5">
                                                 <div><label className="block text-gray-700">Occupation</label>
-                                                    <CreatableSelect
-                                                        ref={selectInputRef}
+                                                    <CreatableSelect ref={selectInputRef}
                                                         isClearable={true} options={drpDwnOptn} onChange={handleOcupation} />
                                                 </div>
 
@@ -408,7 +320,7 @@ function UserCreate() {
 
                                             <div className="flex -mx-3">
                                                 <div className="w-full px-3 mb-5">
-                                                    <button type="submit" onClick={handleSubmit} className="block bg-primary-500 hover:bg-primary-400 focus:bg-primary-400 text-white font-semibold rounded-lg px-4 py-3 mt-6 ml-3">
+                                                    <button type="submit" className="block bg-primary-500 hover:bg-primary-400 focus:bg-primary-400 text-white font-semibold rounded-lg px-4 py-3 mt-6 ml-3">
                                                         Create User
                                                     </button>
                                                 </div>

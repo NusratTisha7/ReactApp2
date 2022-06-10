@@ -68,3 +68,15 @@ export const deleteUser = (email) => {
         }
     })
 }
+
+export const editUserInfo = (data,email) => {
+    console.log("data",data)
+    const token = JSON.parse(localStorage.getItem('jwt'))
+    
+    return axios.put(`${API}/Admin/${email}`, data,{
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`
+        }
+    })
+}
