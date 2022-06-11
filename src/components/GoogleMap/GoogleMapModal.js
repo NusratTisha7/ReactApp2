@@ -16,10 +16,10 @@ let lat = 43.6532, lng = -79.3832
 
 function GoogleMapModal({map,handleClose,handleLocation}) {
 
-    useLoadScript({
-        googleMapsApiKey: "AIzaSyCN8snQFg1eriDbdHIgHPWxirZKkz2PKyY",
+    // useLoadScript({
+    //     googleMapsApiKey: "AIzaSyCN8snQFg1eriDbdHIgHPWxirZKkz2PKyY",
 
-    });
+    // });
 
 
     const btnStyle = { backgroundColor: "#00004d", color: 'white', marginTop: "550px", padding: '5px 10px' }

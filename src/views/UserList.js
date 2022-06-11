@@ -108,9 +108,8 @@ function UserList() {
     }
 
     const userEdit = (user) => () => {
-        localStorage.setItem('user',JSON.stringify(user))
         history.push({
-            pathname: '/edit',
+            pathname: `/edit/${user.email}`,
         });
     }
 

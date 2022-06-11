@@ -10,7 +10,6 @@ export const login = (user) => {
 }
 
 export const registration = (user, token) => {
-    console.log("user",user)
     return axios.post(`${API}/User/Registration`, user, {
         headers: {
             'Content-Type': 'application/json',
@@ -22,6 +21,16 @@ export const registration = (user, token) => {
 
 export const userList = (token, pageIndex, pageSize) => {
     return axios.get(`${API}/Admin/getuser?PageNumber=${pageIndex}&PageSize=10`, {
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`
+        }
+    })
+}
+
+export const getOneUser = (mail) => {
+    const token = JSON.parse(localStorage.getItem('jwt'))
+    return axios.get(`${API}/Admin/getOneUser?email=${mail}`, {
         headers: {
             'Content-Type': 'application/json',
             "Authorization": `Bearer ${token}`

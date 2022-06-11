@@ -20,7 +20,7 @@ const App = () => {
             <PrivateRoute path="/Chat_history/:id/:mail">
                 <Chat />
             </PrivateRoute >
-            <PrivateRoute path="/edit">
+            <PrivateRoute path="/edit/:mail">
                 <EditUser />
             </PrivateRoute >
         </Switch>

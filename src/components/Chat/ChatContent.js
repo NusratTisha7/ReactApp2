@@ -21,7 +21,6 @@ function ChatContent() {
     chatList(id, mail)
       .then(res => {
         setChat(res.data.msgList)
-        console.log("19", res.data.msgList)
         for (let user of res.data.msgList) {
           if (user.email === mail) {
             setCurrentUser({

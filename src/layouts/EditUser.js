@@ -1,4 +1,5 @@
-import UserUpdate from '../components/Update/userEdit';
+//import UserUpdate from '../views/userEdit';
+import UserUpdate from '../views/userEdit';
 import {useEffect} from 'react';
 
 const EditUser = () => {

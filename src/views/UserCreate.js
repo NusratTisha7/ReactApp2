@@ -72,10 +72,7 @@ function UserCreate() {
     const handleSubmit = e => {
         setOpen(true)
         e.preventDefault();
-        if(mobile!==''){
-            email=mobile
-        }
-        registration({ fullName, email, bDate, address, password, ocacupation, mobile, photo }, token)
+        registration({ fullName, email: mobile, bDate, address, password, ocacupation, mobile, photo }, token)
             .then(response => {
                 setOpen(false)
                 setValues({

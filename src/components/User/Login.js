@@ -49,6 +49,7 @@ const Login = () => {
                         Message(true, msg)
                     })
                 }).catch(e => {
+                    console.log("e",e)
                     setOpen(false)
                     setLoginForm({
                         email: '',
