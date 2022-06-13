@@ -15,6 +15,7 @@ import { useHistory } from "react-router-dom";
 import Card2 from '@mui/material/Card';
 import { ImageUrl } from '../utils/config';
 let index = 1
+import { API } from '../utils/config';
 
 function UserList() {
     const { token } = userInfo();
@@ -113,6 +114,10 @@ function UserList() {
         });
     }
 
+    const downloadExcel = () =>{
+        window.open(`${API}/Admin/getExcell`);
+    }
+
     return (
         <div>
             <Modal
@@ -197,6 +202,7 @@ function UserList() {
                             <button class="page-link" aria-label="Previous" disabled={nextDisbale} onClick={next}> <span aria-hidden="true" >&raquo;</span> </button>
                         </li>
                     </ul>
+                    <div><button className='btn btn-primary' onClick={downloadExcel}>Download As Excel</button></div>
                 </nav>
             </Card>
         </div>

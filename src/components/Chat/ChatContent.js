@@ -47,7 +47,7 @@ function ChatContent() {
         </div>
 
       </div>
-      <div className="content__body">
+      <div className="content__body scroll">
         <div >
           {chat.map((itm, index) => {
             return (

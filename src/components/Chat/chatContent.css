@@ -43,6 +43,11 @@
   ); /* or: ease, ease-in, ease-in-out, linear, cubic-bezier(x1, y1, x2, y2) */
   animation-fill-mode: both; /* or: backwards, both, none */
   animation-delay: 0.2s; /* or: Xms */
+  
+}
+.scroll{
+  overflow: scroll;
+  height: 80vh;
 }
 @keyframes showIn {
   0% {
@@ -54,9 +59,10 @@
 }
 .chat__item .avatar {
   margin-right: 0px;
-  margin-left: 20px;
-  padding: 1px;
 }
+
+
+
 .chat__item__content {
   background-color: #4462ff;
   color: #fff;
@@ -64,6 +70,7 @@
   border-radius: 10px 10px 0 10px;
   max-width: 50%;
   min-width: 215px;
+  overflow: hidden;
 }
 
 .chat__item.other {
@@ -77,8 +84,6 @@
   max-width: 50%;
 }
 .chat__item.other .avatar {
-  margin-right: 20px;
   margin-left: 0px;
-  margin-bottom: 10px;
 }
 

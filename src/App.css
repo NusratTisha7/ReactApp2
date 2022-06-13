@@ -1,11 +1,12 @@
 .avatar {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 15px;
+    max-width: 50px;
+    height: 50px;
+    margin: 5px;
   }
   
 .avatar_img{
     clip-path: circle();
+    margin-top: 5px;
 }
 
 .scroll{
