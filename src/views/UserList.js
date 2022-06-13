@@ -130,13 +130,16 @@ function UserList() {
                 style={{ outline: 0 }}
             >
                 <div className='modal-dialog-scrollable modal-dialog modal-dialog-centered swal2-modal swal2-popup swal2-show modal-lg'>
-                    <div className="modal-content kt-iconbox  p-2">
+                    <div className="modal-content kt-iconbox p-5 m-2">
                         {chatList.length === 0 && (
                             <div style={{ padding: '50px', textAlign: 'center' }}>No chats yet</div>
                         )}
+                        {chatList.length !== 0 && (
+                            <p>Chat List</p>
+                        )}
                         {chatList.map(list =>
                         (
-                            <Card2 className='mt-2'>
+                             <Card2 className='mt-2'>
                                 <div className='d-flex p-2 chat_item mt-3' onClick={viewHistory(list)}>
                                     {list.imgURL && (
                                         <div className="avatar">
@@ -145,10 +148,10 @@ function UserList() {
                                     )}
 
                                     <div className="m-2">
-                                        <p>{list.name}</p>
-                                        <span>{list.chat.message}</span>
+                                        <p style={{fontWeight:'bold'}}>{list.name}</p>
+                                        <span className='text-muted'>{list.chat.message}</span>
                                     </div>
-                                    <div className='mt-2 mr-5'>
+                                    <div className='mt-2 mr-5' style={{flex:"end"}}>
                                         <span>{moment(list.chat.dateTime).format('YYYY-MM-DD')}</span>
                                     </div>
                                 </div>
