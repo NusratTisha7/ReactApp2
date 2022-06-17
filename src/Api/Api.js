@@ -19,8 +19,14 @@ export const registration = (user, token) => {
 }
 
 
-export const userList = (token, pageIndex, pageSize) => {
-    return axios.get(`${API}/Admin/getuser?PageNumber=${pageIndex}&PageSize=10`, {
+export const userList = (token, pageIndex, quary) => {
+    let url;
+    if(quary){
+        url=`${API}/Admin/getuser?PageNumber=${pageIndex}&PageSize=10&quary=${quary}`
+    } else {
+        url=`${API}/Admin/getuser?PageNumber=${pageIndex}&PageSize=10`
+    }
+    return axios.get(url, {
         headers: {
             'Content-Type': 'application/json',
             "Authorization": `Bearer ${token}`

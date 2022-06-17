@@ -25,16 +25,26 @@ function UserList() {
     let [prevDisbale, setPrevDisable] = useState(false)
     let [nextDisbale, setNextDisable] = useState(false)
     let [chatList, setChatList] = useState([])
+    let [search, setSearch] = useState("")
     let history = useHistory();
 
+    const searchBtn = {
+        float: "left",
+        width: "20%",
+        padding: "5px",
+        background: "#F7F7F8",
+        color: "black",
+        fontSize: "17px",
+        cursor: "pointer",
+    }
     useEffect(() => {
         document.title = 'User List';
         getUserList()
     }, [])
 
-    const getUserList = () => {
+    const getUserList = (quary='') => {
         setOpen(true)
-        userList(token, index, 10)
+        userList(token, index, quary)
             .then(res => {
                 setOpen(false)
                 if (res.data.data.length > 0) {
@@ -114,9 +124,18 @@ function UserList() {
         });
     }
 
-    const downloadExcel = () =>{
+    const downloadExcel = () => {
         window.open(`${API}/Admin/getExcell`);
     }
+
+    const searchTerm = (e) =>{
+        setSearch(e.currentTarget.value)
+    }
+
+    const searchUser = () =>{
+        getUserList(search)
+    }
+
 
     return (
         <div>
@@ -139,7 +158,7 @@ function UserList() {
                         )}
                         {chatList.map(list =>
                         (
-                             <Card2 className='mt-2'>
+                            <Card2 className='mt-2'>
                                 <div className='d-flex p-2 chat_item mt-3' onClick={viewHistory(list)}>
                                     {list.imgURL && (
                                         <div className="avatar">
@@ -148,10 +167,10 @@ function UserList() {
                                     )}
 
                                     <div className="m-2">
-                                        <p style={{fontWeight:'bold'}}>{list.name}</p>
+                                        <p style={{ fontWeight: 'bold' }}>{list.name}</p>
                                         <span className='text-muted'>{list.chat.message}</span>
                                     </div>
-                                    <div className='mt-2 mr-5' style={{flex:"end"}}>
+                                    <div className='mt-2 mr-5' style={{ flex: "end" }}>
                                         <span>{moment(list.chat.dateTime).format('YYYY-MM-DD')}</span>
                                     </div>
                                 </div>
@@ -163,6 +182,17 @@ function UserList() {
             </Modal>
             <Loader open={open} />
             <Card className='p-5'>
+                <div style={{ width: "300px", marginBottom: "10px", display: 'flex' }}>
+                    <input
+                        className="form-control"
+                        type="search"
+                        placeholder="Search"
+                        name="serachTerm"
+                        onChange={searchTerm}
+                    >
+                    </input>
+                    <button type="submit" style={searchBtn} onClick={searchUser}><i class="fa fa-search" ></i></button>
+                </div>
                 <Table responsive="sm">
                     <thead>
                         <tr>
